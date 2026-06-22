@@ -1,7 +1,7 @@
 # Cloudflare Access Proxy (VS Code extension)
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/nextgarch.cf-access-proxy?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cf-access-proxy)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/nextgarch.cf-access-proxy)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cf-access-proxy)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/nextgarch.cloudflare-access-proxy?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cloudflare-access-proxy)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/nextgarch.cloudflare-access-proxy)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cloudflare-access-proxy)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 A tiny local HTTP forward-proxy that injects `CF-Access-Client-Id` and
