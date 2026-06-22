@@ -199,11 +199,21 @@ function updateStatusBar(): void {
         return;
     }
     if (server && currentConfig) {
-        statusBar.text = `CF Proxy: :${currentConfig.port}`;
+        statusBar.text = `$(check) CF Proxy :${currentConfig.port}`;
         statusBar.tooltip = `Forwarding 127.0.0.1:${currentConfig.port} -> https://${currentConfig.host}`;
     } else {
-        statusBar.text = "CF Proxy: stopped";
-        statusBar.tooltip = "CF Access Proxy is not running";
+        // Distinguish "user disabled it / configured but stopped" from
+        // "never been configured." Helps the user know what to do next
+        // without opening Output.
+        const cfg = currentConfig ?? readConfig();
+        if (!cfg.clientId) {
+            statusBar.text = "$(gear) CF Proxy: not configured";
+            statusBar.tooltip =
+                "Click for details. Set cfAccessProxy.clientId in Settings and run \"CF Access Proxy: Set Client Secret\" to start.";
+        } else {
+            statusBar.text = "$(circle-slash) CF Proxy: stopped";
+            statusBar.tooltip = "CF Access Proxy is not running. Click for details.";
+        }
     }
     statusBar.show();
 }
@@ -231,42 +241,51 @@ function stopServer(): Promise<void> {
     });
 }
 
-async function startServer(ctx: vscode.ExtensionContext): Promise<void> {
+// `interactive` controls whether missing-config conditions surface as
+// popups. The flag exists so the extension stays silent on initial
+// install (activation triggered automatically by VS Code) — and only
+// nudges the user when they explicitly ask to start/restart the proxy.
+// Missing-config details always land in the Output channel + status bar
+// regardless of the flag.
+async function startServer(
+    ctx: vscode.ExtensionContext,
+    interactive: boolean,
+): Promise<void> {
     const cfg = readConfig();
     currentConfig = cfg;
 
-    if (!cfg.enable) {
-        log("not starting: cfAccessProxy.enable is false");
-        vscode.window.showWarningMessage(
-            "CF Access Proxy is disabled (cfAccessProxy.enable = false).",
-        );
+    const notConfigured = (msg: string) => {
+        log("not starting: " + msg);
+        if (interactive) {
+            vscode.window.showWarningMessage("CF Access Proxy: " + msg);
+        }
         updateStatusBar();
+    };
+
+    if (!cfg.enable) {
+        notConfigured(
+            "disabled (cfAccessProxy.enable = false). Set it to true to start.",
+        );
         return;
     }
     if (!cfg.clientId) {
-        log("not starting: cfAccessProxy.clientId is empty");
-        vscode.window.showWarningMessage(
-            "CF Access Proxy: set cfAccessProxy.clientId in settings.",
+        notConfigured(
+            'cfAccessProxy.clientId is not set. Add it in Settings, then run "CF Access Proxy: Restart".',
         );
-        updateStatusBar();
         return;
     }
     if (!cfg.host) {
-        log("not starting: cfAccessProxy.host is empty");
-        vscode.window.showWarningMessage(
-            "CF Access Proxy: set cfAccessProxy.host in settings.",
+        notConfigured(
+            'cfAccessProxy.host is not set. Add it in Settings, then run "CF Access Proxy: Restart".',
         );
-        updateStatusBar();
         return;
     }
 
     const secret = await ctx.secrets.get(SECRET_KEY);
     if (!secret) {
-        log("not starting: client secret not set in SecretStorage");
-        vscode.window.showWarningMessage(
-            'CF Access Proxy: run "CF Access Proxy: Set Client Secret" from the command palette to set the secret.',
+        notConfigured(
+            'client secret is not set. Run "CF Access Proxy: Set Client Secret" from the command palette.',
         );
-        updateStatusBar();
         return;
     }
 
@@ -533,10 +552,13 @@ async function startServer(ctx: vscode.ExtensionContext): Promise<void> {
     updateStatusBar();
 }
 
-async function restart(ctx: vscode.ExtensionContext): Promise<void> {
+async function restart(
+    ctx: vscode.ExtensionContext,
+    interactive: boolean,
+): Promise<void> {
     log("restart requested");
     await stopServer();
-    await startServer(ctx);
+    await startServer(ctx, interactive);
 }
 
 export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
@@ -586,19 +608,44 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
             );
         }),
         vscode.commands.registerCommand("cfAccessProxy.restart", async () => {
-            await restart(ctx);
+            await restart(ctx, /* interactive */ true);
             vscode.window.showInformationMessage(
                 server
                     ? `CF Access Proxy: listening on 127.0.0.1:${currentConfig?.port}.`
                     : "CF Access Proxy: not listening (see Output: CF Access Proxy).",
             );
         }),
-        vscode.commands.registerCommand("cfAccessProxy.status", () => {
+        vscode.commands.registerCommand("cfAccessProxy.status", async () => {
             const cfg = currentConfig ?? readConfig();
-            const state = server ? "listening" : "stopped";
-            vscode.window.showInformationMessage(
-                `CF Access Proxy: ${state}. host=${cfg.host} port=${cfg.port} clientId=${cfg.clientId ? "set" : "(unset)"}`,
-            );
+            const secretSet = !!(await ctx.secrets.get(SECRET_KEY));
+            if (server) {
+                vscode.window.showInformationMessage(
+                    `CF Access Proxy: listening on 127.0.0.1:${cfg.port} -> https://${cfg.host}.`,
+                );
+                return;
+            }
+            const missing: string[] = [];
+            if (!cfg.clientId) {
+                missing.push("cfAccessProxy.clientId (Settings)");
+            }
+            if (!cfg.host) {
+                missing.push("cfAccessProxy.host (Settings)");
+            }
+            if (!secretSet) {
+                missing.push("client secret (run \"CF Access Proxy: Set Client Secret\")");
+            }
+            if (!cfg.enable) {
+                missing.push("cfAccessProxy.enable (Settings — currently false)");
+            }
+            if (missing.length === 0) {
+                vscode.window.showInformationMessage(
+                    "CF Access Proxy: stopped. Run \"CF Access Proxy: Restart\" to start the listener.",
+                );
+            } else {
+                vscode.window.showInformationMessage(
+                    `CF Access Proxy: not configured. Missing: ${missing.join("; ")}.`,
+                );
+            }
         }),
     );
 
@@ -606,7 +653,9 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration(CONFIG_SECTION)) {
                 log("configuration changed; restarting");
-                void restart(ctx);
+                // User just edited a setting — they're paying attention.
+                // Surface missing-config issues as popups.
+                void restart(ctx, /* interactive */ true);
             }
         }),
     );
@@ -615,7 +664,9 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
         ctx.secrets.onDidChange((e) => {
             if (e.key === SECRET_KEY) {
                 log("client secret changed; restarting");
-                void restart(ctx);
+                // The secret was just set/cleared via a command — also a
+                // moment of user attention.
+                void restart(ctx, /* interactive */ true);
             }
         }),
     );
@@ -626,7 +677,10 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
         },
     });
 
-    await startServer(ctx);
+    // Activation is automatic on VS Code startup. Stay silent on missing
+    // config — the status bar carries the state and the user can click it
+    // (or run "Show Status") when they're ready to configure.
+    await startServer(ctx, /* interactive */ false);
 }
 
 export async function deactivate(): Promise<void> {

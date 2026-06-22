@@ -4,6 +4,29 @@ All notable changes to **Cloudflare Access Proxy** are recorded here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] — 2026-06-22
+
+### Changed
+
+- **Silent activation when not configured.** On a fresh install the
+  extension no longer surfaces popup warnings about missing settings.
+  Configuration state is shown in the status bar — *"CF Proxy: not
+  configured"* when `clientId` / secret aren't set, *"CF Proxy stopped"*
+  when configured but not listening. Click the status bar (or run
+  *CF Access Proxy: Show Status*) to see exactly what's missing.
+- *CF Access Proxy: Show Status* now lists every missing piece in a
+  single message instead of reporting just the first.
+- Popups still appear when the user explicitly invokes
+  *CF Access Proxy: Restart*, edits a `cfAccessProxy.*` setting, or
+  changes the client secret — those are moments of user attention where
+  surfacing the issue is helpful.
+
+### Fixed
+
+- Removed the prefix-of-a-real-client-ID from the `cfAccessProxy.clientId`
+  description in `package.json`. The setting description now describes
+  the value's shape generically rather than embedding a partial example.
+
 ## [0.4.1] — 2026-06-22
 
 ### Removed
@@ -47,5 +70,6 @@ First public release on the VS Code Marketplace.
   Authorization headers, CF Access secrets, request bodies, and response
   bodies are never logged.
 
+[0.4.2]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.2
 [0.4.1]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.1
 [0.4.0]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.0
