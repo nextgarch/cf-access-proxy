@@ -8,10 +8,30 @@
     "vscode": "^1.85.0"
   },
   "main": "./dist/extension.js",
+  "icon": "icon.png",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nextgarch/cf-access-proxy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nextgarch/cf-access-proxy/issues"
+  },
+  "homepage": "https://github.com/nextgarch/cf-access-proxy#readme",
+  "keywords": [
+    "cloudflare",
+    "access",
+    "proxy",
+    "openai",
+    "vllm",
+    "ollama",
+    "copilot",
+    "chat"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],
-  "categories": ["Other"],
+  "categories": ["AI", "Other"],
   "contributes": {
     "configuration": {
       "title": "Cloudflare Access Proxy",

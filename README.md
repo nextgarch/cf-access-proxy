@@ -1,5 +1,9 @@
 # Cloudflare Access Proxy (VS Code extension)
 
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/nextgarch.cf-access-proxy?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cf-access-proxy)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/nextgarch.cf-access-proxy)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cf-access-proxy)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+
 A tiny local HTTP forward-proxy that injects `CF-Access-Client-Id` and
 `CF-Access-Client-Secret` headers on every outgoing request. It exists for one
 specific situation:
@@ -14,6 +18,10 @@ This extension runs `http://127.0.0.1:<port>` inside VS Code, transparently
 forwards every request to `https://<your-upstream>:443` with the right CF
 Access headers attached, and pipes the response back. Auto-starts when VS Code
 launches.
+
+Includes default-on compatibility shims that make reasoning models (vLLM
+with Qwen3 / DeepSeek-V4/R1; Ollama 0.3.x+) work cleanly with strict OpenAI
+clients like Copilot Chat — see *vLLM reasoning-model compatibility* below.
 
 ## Build
 
