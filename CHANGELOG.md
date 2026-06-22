@@ -4,6 +4,12 @@ All notable changes to **Cloudflare Access Proxy** are recorded here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] — 2026-06-22
+
+### Removed
+
+- Custom icon. Falls back to the marketplace default. (No behavior change.)
+
 ## [0.4.0] — 2026-06-22
 
 First public release on the VS Code Marketplace.
@@ -41,4 +47,5 @@ First public release on the VS Code Marketplace.
   Authorization headers, CF Access secrets, request bodies, and response
   bodies are never logged.
 
+[0.4.1]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.1
 [0.4.0]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.0
