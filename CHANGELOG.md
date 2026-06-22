@@ -4,6 +4,14 @@ All notable changes to **Cloudflare Access Proxy** are recorded here. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.4] — 2026-06-22
+
+### Changed
+
+- README polish to match the rename in 0.4.3: title now reads
+  *Cloudflare Access Forward Proxy*, and the build/install sections
+  reference the actual VSIX filename (`cloudflare-access-proxy-<version>.vsix`).
+
 ## [0.4.3] — 2026-06-22
 
 ### Changed
@@ -83,6 +91,7 @@ First public release on the VS Code Marketplace.
   Authorization headers, CF Access secrets, request bodies, and response
   bodies are never logged.
 
+[0.4.4]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.4
 [0.4.3]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.3
 [0.4.2]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.2
 [0.4.1]: https://github.com/nextgarch/cf-access-proxy/releases/tag/v0.4.1

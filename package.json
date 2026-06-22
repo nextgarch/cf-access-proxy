@@ -2,7 +2,7 @@
   "name": "cloudflare-access-proxy",
   "displayName": "Cloudflare Access Forward Proxy",
   "description": "Local HTTP proxy that adds CF-Access-Client-Id / -Secret headers to upstream requests. Lets VS Code chat extensions (which don't support custom headers) reach a Cloudflare-Access-gated OpenAI-compatible endpoint via http://127.0.0.1:<port>.",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "publisher": "nextgarch",
   "engines": {
     "vscode": "^1.85.0"
