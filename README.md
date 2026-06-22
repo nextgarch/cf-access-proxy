@@ -1,4 +1,4 @@
-# Cloudflare Access Proxy (VS Code extension)
+# Cloudflare Access Forward Proxy (VS Code extension)
 
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/nextgarch.cloudflare-access-proxy?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cloudflare-access-proxy)
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/nextgarch.cloudflare-access-proxy)](https://marketplace.visualstudio.com/items?itemName=nextgarch.cloudflare-access-proxy)
@@ -32,20 +32,20 @@ npm install
 npm run package
 ```
 
-That produces `cf-access-proxy-<version>.vsix` in the project root.
+That produces `cloudflare-access-proxy-<version>.vsix` in the project root.
 
 ## Install
 
 Local VS Code:
 
 ```sh
-code --install-extension cf-access-proxy-<version>.vsix
+code --install-extension cloudflare-access-proxy-<version>.vsix
 ```
 
 Remote-SSH host (install into the remote, not your local UI):
 
 ```sh
-code --install-extension cf-access-proxy-<version>.vsix --remote ssh-remote+<hostname>
+code --install-extension cloudflare-access-proxy-<version>.vsix --remote ssh-remote+<hostname>
 ```
 
 Or, with VS Code already attached to the remote, open the Extensions panel and
