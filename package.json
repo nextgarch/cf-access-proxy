@@ -1,0 +1,84 @@
+{
+  "name": "cf-access-proxy",
+  "displayName": "Cloudflare Access Proxy",
+  "description": "Local HTTP proxy that adds CF-Access-Client-Id / -Secret headers to upstream requests. Lets VS Code chat extensions (which don't support custom headers) reach a Cloudflare-Access-gated OpenAI-compatible endpoint via http://127.0.0.1:<port>.",
+  "version": "0.4.0",
+  "publisher": "nextgarch",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "categories": ["Other"],
+  "contributes": {
+    "configuration": {
+      "title": "Cloudflare Access Proxy",
+      "properties": {
+        "cfAccessProxy.host": {
+          "type": "string",
+          "default": "api.nextgarch.org",
+          "description": "Upstream host (e.g. api.nextgarch.org). The proxy forwards every request to https://<host>:443/<original-path>."
+        },
+        "cfAccessProxy.port": {
+          "type": "integer",
+          "default": 8787,
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Local TCP port the proxy listens on. Point your chat extension's OpenAI base URL at http://127.0.0.1:<this-port>."
+        },
+        "cfAccessProxy.clientId": {
+          "type": "string",
+          "default": "",
+          "description": "CF Access service-token client ID (the value ending in .access from your Cloudflare Zero Trust service token). The matching secret is stored separately via the \"CF Access Proxy: Set Client Secret\" command, never in settings.json."
+        },
+        "cfAccessProxy.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Start the proxy when VS Code launches. Disable to keep the extension installed but stop the listener."
+        },
+        "cfAccessProxy.disableThinking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Inject thinking-disable fields into POST /v1/chat/completions bodies that don't set them. Adds both chat_template_kwargs.enable_thinking=false (vLLM-style, used by Qwen3, DeepSeek-V4/R1) and top-level think=false (Ollama-style, 0.3.x+). Each backend ignores the field it doesn't know. Makes reasoning models emit OpenAI-spec-compliant streams (content only, no reasoning_content) — fixes 'no response was returned' in clients like Copilot Chat. Set false to pass through reasoning unchanged."
+        },
+        "cfAccessProxy.stripEmptyToolCalls": {
+          "type": "boolean",
+          "default": true,
+          "description": "Strip empty tool_calls:[] fields from /v1/chat/completions response chunks (SSE delta and non-stream message). vLLM emits an empty array alongside content when the request includes tools, which strict OpenAI clients (Copilot Chat) interpret as a tool-call message — causing them to ignore the content. Real (non-empty) tool calls pass through untouched."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "cfAccessProxy.setSecret",
+        "title": "CF Access Proxy: Set Client Secret"
+      },
+      {
+        "command": "cfAccessProxy.clearSecret",
+        "title": "CF Access Proxy: Clear Client Secret"
+      },
+      {
+        "command": "cfAccessProxy.restart",
+        "title": "CF Access Proxy: Restart"
+      },
+      {
+        "command": "cfAccessProxy.status",
+        "title": "CF Access Proxy: Show Status"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.3.0"
+  }
+}
